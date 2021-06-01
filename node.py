@@ -16,6 +16,7 @@ OUTPUT_FILE = str(ASSIGNED_IDX) + '_output.csv'
 PFILE= open('real_parameters','r')
 AVAIBLES_TRACK = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')
 parallel = True
+THREADS_NUM = 5
 
 keys= json.load(PFILE).keys()
 
@@ -44,7 +45,7 @@ def wait_parameters():
             parameters = read_file(os.path.join(MAIN_DIRECTORY, INPUT_FILE))
             print(str(len(parameters)) + ' parameters received.')
             if parallel:
-                results = evaluate_batch_parallel(parameters, keys)
+                results = evaluate_batch_parallel(parameters, keys, num_threads=THREADS_NUM)
             else:
                 results = evaluate_batch(parameters, keys)
             return results
