@@ -9,14 +9,13 @@ import json
 import os
 import csv
 
-n_pop = 10
+n_pop = 300
 n_vars = 48
-max_gens = 300
+max_gens = 100
 resume = True
 NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'G:\\.shortcut-targets-by-id\\1PPpeUb1JKMON-OadWEYmROa3rJWxawcx\\Addestramento'
-resume = False
-THREADS_NUM = 7
+THREADS_NUM = 4
 parallel = True
 
 def read_parameters():
