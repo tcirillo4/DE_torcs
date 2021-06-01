@@ -13,9 +13,9 @@ n_pop = 300
 n_vars = 48
 max_gens = 30
 resume = True
-NUM_OF_NODES = 1
+NUM_OF_NODES = 2
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
-THREADS_NUM = 5
+THREADS_NUM = 7
 parallel = True
 
 def read_parameters():

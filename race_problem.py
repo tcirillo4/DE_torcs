@@ -19,7 +19,7 @@ from func_timeout import exit_after
 
 computation_weights =  {
     1 : {0 : 1},
-    2 : {0 : .65, 1 : .35},
+    2 : {0 : .7, 1 : .3},
     3 : {0 : .5, 1 : .25, 2 : .25},
     4 : {0 : .32, 1 : .17, 2 : .24, 3 : .27}
 }

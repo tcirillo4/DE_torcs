@@ -56,7 +56,7 @@ def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEF
                 tmp[key] = batch[i + idx][j]
             parameters.append((tmp, available_tracks[(i + idx) // change_track]))
 
-        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / res['laplength'] for res  in parallel_evaluation(parameters)])
+        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / (res['laplength'] if res['laplength'] !=0 else 10) for res  in parallel_evaluation(parameters)])
 
     return res_lst
 
