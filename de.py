@@ -1,3 +1,4 @@
+from joblib import parallel
 from race_problem import RaceProblem
 from pymoo.optimize import minimize
 from pymoo.factory import get_termination
@@ -15,6 +16,8 @@ resume = True
 NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'G:\\.shortcut-targets-by-id\\1PPpeUb1JKMON-OadWEYmROa3rJWxawcx\\Addestramento'
 resume = False
+THREADS_NUM = 7
+parallel = True
 
 def read_parameters():
     parameters = []
@@ -48,7 +51,7 @@ def init_population(resume = True):
     return init_pop
 
 # problem to be solved
-problem = RaceProblem(main_directory=MAIN_DIRECTORY, resume = resume, num_nodes=NUM_OF_NODES)
+problem = RaceProblem(main_directory=MAIN_DIRECTORY, resume = resume, num_nodes=NUM_OF_NODES, parallel=parallel, num_threads=THREADS_NUM)
 
 termination = get_termination("n_gen", max_gens)
 

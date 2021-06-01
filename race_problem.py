@@ -118,10 +118,6 @@ class RaceProblem(Problem):
         with open(os.path.join('output_files','results.csv'), 'a', newline='') as f: 
             f.write(str(min(res_lst)) + '\n')
 
-        # for i in range(len(res_lst)):
-        #     if res_lst[i] < 50:
-        #         res_lst[i] = 1000
-
         best_p = x[np.argmin(res_lst)]
 
         for i, key in enumerate(list(self.parameters.keys())):
