@@ -707,13 +707,12 @@ def launch_server(i = 1):
     subprocess.call([os.path.join('bat_files','server.bat'), str(i)])
 
 def run_all(parameters, idx , track = 'forza'):
-    global C, T, last_track
+    global C, T
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
-    if track != last_track:
-        last_track = track
-        TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
-        os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
-        shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
+    last_track = track
+    TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
+    os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
+    shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
     Thread(target= launch_server, args=[idx]).start()
     T= Track()
     C= snakeoil.Client(parameters=parameters, port=3001 + (idx - 1))

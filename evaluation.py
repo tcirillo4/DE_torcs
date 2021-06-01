@@ -7,6 +7,7 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import math
 import concurrent.futures
+import random
 
 DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
 
@@ -40,6 +41,7 @@ def parallel_evaluation(parameters):
         if 'error' in res:
             subprocess.call([os.path.join('bat_files','stop_server.bat')])
     return all_res
+    
 
 def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS):
     res_lst = []
@@ -47,6 +49,26 @@ def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEF
     change_track = math.ceil(len(batch) / len(available_tracks))
     
     for i in tqdm(range(0, len(batch), num_threads)):
+        max_element = min(num_threads, len(batch) - i)
+        parameters = []
+        
+        for idx in range(max_element):     
+            tmp = {}
+            for j, key in enumerate(keys):
+                tmp[key] = batch[i + idx][j]
+            parameters.append((tmp, random.choice(available_tracks)))
+
+        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / (res['laplength'] if res['laplength'] !=0 else 10) for res  in parallel_evaluation(parameters)])
+
+    return res_lst
+
+
+def evaluate_batch_parallel_faster(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS):
+    res_lst = [None for _ in range(len(batch))]
+    
+    change_track = math.ceil(len(batch) / len(available_tracks))
+    
+    for i in tqdm(range(len(batch))):
         max_element = min(num_threads, len(batch) - i)
         parameters = []
         
