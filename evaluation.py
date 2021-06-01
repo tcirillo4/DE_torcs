@@ -6,8 +6,9 @@ import time
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import math
+import concurrent.futures
 
-DEFAULT_TRACKS = (('forza', 5784.10),('eTrack_3', 4208.37), ('cgTrack_2', 3185.83), ('wheel',4328.54))
+DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
 
 @exit_after(30)
 def evaluate_parameters(parameters, idx, track, kill_process = True):
@@ -25,7 +26,8 @@ def evaluate_parameters(parameters, idx, track, kill_process = True):
                 'damage' : 5000,
                 'lapTime' : 1000,
                 'distRaced' : 10,
-                'error' : True
+                'error' : True,
+                'laplength' : 10
 
             }
     return res
@@ -47,14 +49,14 @@ def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEF
     for i in tqdm(range(0, len(batch), num_threads)):
         max_element = min(num_threads, len(batch) - i)
         parameters = []
-
+        
         for idx in range(max_element):     
             tmp = {}
             for j, key in enumerate(keys):
-                tmp[key] = batch[i][j]
-            parameters.append((tmp, available_tracks[(i + idx) // change_track][0]))
+                tmp[key] = batch[i + idx][j]
+            parameters.append((tmp, available_tracks[(i + idx) // change_track]))
 
-        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / available_tracks[(i + idx) // change_track][1] for res  in parallel_evaluation(parameters)])
+        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / res['laplength'] for res  in parallel_evaluation(parameters)])
 
     return res_lst
 
@@ -70,8 +72,8 @@ def evaluate_batch(batch, keys, available_tracks = DEFAULT_TRACKS):
             for j, key in enumerate(keys):
                 parameters[key] = individual[j]
 
-            res = evaluate_parameters(parameters, 1, available_tracks[i // change_track][0])
-            res_lst.append(res['lapTime']/available_tracks[i // change_track][1])
+            res = evaluate_parameters(parameters, 1, available_tracks[i // change_track])
+            res_lst.append(res['lapTime']/res['laplength'])
             pbar.update(1)
 
     return res_lst

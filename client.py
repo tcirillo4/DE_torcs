@@ -714,7 +714,7 @@ def run_all(parameters, idx , track = 'forza'):
         TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
         os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
         shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
-    Thread(target= launch_server, args=[idx]).start                                                                                                                                                                                                                                                                               ()
+    Thread(target= launch_server, args=[idx]).start()
     T= Track()
     C= snakeoil.Client(parameters=parameters, port=3001 + (idx - 1))
     start = time.time()
@@ -741,7 +741,8 @@ def run_all(parameters, idx , track = 'forza'):
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
             'lapTime' : C.S.d['curLapTime'],
-            'distRaced' : C.S.d['distRaced']
+            'distRaced' : C.S.d['distRaced'],
+            'laplength' : T.laplength
         }
         C.respond_to_server()
         C.shutdown()
@@ -752,7 +753,8 @@ def run_all(parameters, idx , track = 'forza'):
             'damage' : 10000,
             'lapTime' : 1000,
             'distRaced' : 10,
-            'error' : True
+            'error' : True,
+            'laplength' : T.laplength
         }
     return results
     
@@ -760,7 +762,6 @@ def run_graphic(parameters):
     global C, T
     T= Track()
     C= snakeoil.Client(parameters=parameters)
-    start = time.time()
     initialize_car(C)
     C.S.d['stucktimer']= 0
     C.S.d['targetSpeed']= 0
@@ -800,9 +801,8 @@ def read_parameters(keys):
     return parameters
 
 if __name__ == "__main__":
-    pfile= open(os.path.join('results_100','best_parameters.json'),'r')
+    pfile= open(os.path.join('output_files_backup','best_parameters.json'),'r')
     parameters= json.load(pfile)
-    print(run_all(parameters, 1))
     run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))
