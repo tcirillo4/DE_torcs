@@ -9,6 +9,7 @@ import json
 import os
 import random
 import shutil
+import pathlib
 
 target_speed= 0 
 lap= 0 
@@ -713,7 +714,7 @@ def run_all(parameters, idx , track = 'forza'):
         TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
         os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
         shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
-    Thread(target= launch_server, args=[idx]).start()
+    Thread(target= launch_server, args=[idx]).start                                                                                                                                                                                                                                                                               ()
     T= Track()
     C= snakeoil.Client(parameters=parameters, port=3001 + (idx - 1))
     start = time.time()
@@ -799,8 +800,9 @@ def read_parameters(keys):
     return parameters
 
 if __name__ == "__main__":
-    pfile= open(os.path.join('output_files','best_parameters.json'),'r')
+    pfile= open(os.path.join('results_100','best_parameters.json'),'r')
     parameters= json.load(pfile)
+    print(run_all(parameters, 1))
     run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))

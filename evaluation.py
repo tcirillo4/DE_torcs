@@ -7,14 +7,16 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import math
 
-@exit_after(15)
+DEFAULT_TRACKS = (('forza', 5784.10),('eTrack_3', 4208.37), ('cgTrack_2', 3185.83), ('wheel',4328.54))
+
+@exit_after(30)
 def evaluate_parameters(parameters, idx, track, kill_process = True):
     start = time.time()
     try:
         res = evaluate(parameters, idx,track)
     except KeyboardInterrupt:
         elapsed_time = time.time() - start
-        if elapsed_time < 14:
+        if elapsed_time < 29:
             exit(0)
         if kill_process:
             subprocess.call([os.path.join('bat_files','stop_server.bat')])
@@ -31,13 +33,13 @@ def evaluate_parameters(parameters, idx, track, kill_process = True):
 def parallel_evaluation(parameters):
 
     with Parallel(n_jobs=len(parameters)) as parallel:
-        all_res = parallel(delayed(evaluate_parameters)(parameters[i][0],i + 1, parameters[i][1]) for i in range(len(parameters)))
+        all_res = parallel(delayed(evaluate_parameters)(parameters[i][0],i + 1, parameters[i][1], False) for i in range(len(parameters)))
     for res in all_res:
         if 'error' in res:
             subprocess.call([os.path.join('bat_files','stop_server.bat')])
     return all_res
 
-def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')):
+def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS):
     res_lst = []
     
     change_track = math.ceil(len(batch) / len(available_tracks))
@@ -50,14 +52,14 @@ def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = ('f
             tmp = {}
             for j, key in enumerate(keys):
                 tmp[key] = batch[i][j]
-            parameters.append((tmp, available_tracks[(i + idx) // change_track]))
+            parameters.append((tmp, available_tracks[(i + idx) // change_track][0]))
 
-        res_lst.extend([res['lapTime'] / res['distRaced'] if res['distRaced'] != 0 else 100 for res  in parallel_evaluation(parameters)])
+        res_lst.extend([(res['lapTime'] if res['lapTime'] > 50 else 1000) / available_tracks[(i + idx) // change_track][1] for res  in parallel_evaluation(parameters)])
 
     return res_lst
 
 
-def evaluate_batch(batch, keys, available_tracks = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')):
+def evaluate_batch(batch, keys, available_tracks = DEFAULT_TRACKS):
     res_lst = []
     
     change_track = math.ceil(len(batch) / len(available_tracks))
@@ -68,8 +70,8 @@ def evaluate_batch(batch, keys, available_tracks = ('forza', 'eTrack_3', 'cgTrac
             for j, key in enumerate(keys):
                 parameters[key] = individual[j]
 
-            res = evaluate_parameters(parameters, 1, available_tracks[i // change_track])
-            res_lst.append(res['lapTime']/res['distRaced'])
+            res = evaluate_parameters(parameters, 1, available_tracks[i // change_track][0])
+            res_lst.append(res['lapTime']/available_tracks[i // change_track][1])
             pbar.update(1)
 
     return res_lst
