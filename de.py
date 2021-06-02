@@ -16,11 +16,11 @@ max_gens = 300
 resume = True
 NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
-THREADS_NUM = 7
 parallel = True
+THREADS_NUM = 7
 fitness_function = fitness_1
-AVAILABLE_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
-TRACKS_TO_USE = ('eTrack_3')
+AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
+TRACKS_TO_USE = ['eTrack_3']
 
 def read_parameters():
     parameters = []
