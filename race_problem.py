@@ -130,7 +130,7 @@ class RaceProblem(Problem):
         DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
         for track in DEFAULT_TRACKS:
             print('TRACK: ' + track)
-            print(evaluate(best_p, 1, track))
+            print(evaluate(self.parameters, 1, track))
 
         out['F'] = np.array(res_lst)
 
