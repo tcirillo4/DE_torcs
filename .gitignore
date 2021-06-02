@@ -2,5 +2,6 @@ TORCS/
 results_*/
 backup/
 bot*/
+test.py
 .*/
 __*/
