@@ -3,5 +3,8 @@ results_*/
 backup/
 bot*/
 test.py
+.idea/
+.vscode/
+__pycache__/
 .*/
 __*/
