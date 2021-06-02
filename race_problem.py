@@ -9,7 +9,6 @@ import csv
 import os
 from tqdm import tqdm
 import math
-import subprocess
 import time
 from joblib import Parallel, delayed
 from evaluation import *

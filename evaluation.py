@@ -22,7 +22,7 @@ def evaluate_parameters(parameters, idx, track, debug = False):
         elapsed_time = time.time() - start
         if elapsed_time < 14:
             exit(0)
-        subprocess.call([os.path.join('bat_files','stop_server.bat')], str(idx))
+        subprocess.call([os.path.join('bat_files','stop_server.bat'), str(idx)])
         res = {
                 'racePos' : 100,
                 'damage' : 5000,
@@ -69,6 +69,7 @@ def get_samples(x, num_threads):
 
 def evaluate_batch_parameters(parameters, idx, debug = False):
     res_lst = []
+    print(idx)
     for p in tqdm(parameters):
         res = evaluate_parameters(p[0], idx, p[1], debug)
         res_lst.append(res)
@@ -78,6 +79,7 @@ def parallel_evaluation(parameters, debug):
 
     with Parallel(n_jobs=len(parameters)) as parallel:
         all_res = parallel(delayed(evaluate_batch_parameters)(p,i + 1, debug) for i, p in enumerate(parameters))
+
     return [value for res in all_res for value in res]
 
 def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS, fitness_function = fit, debug = False):
