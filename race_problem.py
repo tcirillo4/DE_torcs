@@ -137,7 +137,8 @@ class RaceProblem(Problem):
         DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
         for track in DEFAULT_TRACKS:
             print('TRACK: ' + track)
-            print(evaluate(self.parameters, 1, track)['lapTime'])
+            res = evaluate(self.parameters, 1, track)
+            print(res['lapTime'] if 'error' not in res else 'ERROR')
 
         out['F'] = np.array(res_lst)
 
