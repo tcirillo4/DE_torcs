@@ -807,9 +807,9 @@ if __name__ == "__main__":
     DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
     pfile= open(os.path.join('output_files','best_parameters.json'),'r')
     parameters= json.load(pfile)
-    for track in DEFAULT_TRACKS:
-        print('TRACK: ' + track)
-        print(run_all(parameters, 1, track))
+    # for track in DEFAULT_TRACKS:
+    #     print('TRACK: ' + track)
+    #     print(run_all(parameters, 1, track)['lapTime'])
     run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))

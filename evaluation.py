@@ -22,7 +22,7 @@ def evaluate_parameters(parameters, idx, track, debug = False):
         elapsed_time = time.time() - start
         if elapsed_time < 14:
             exit(0)
-        subprocess.call([os.path.join('bat_files','stop_server.bat')]. str(idx))
+        subprocess.call([os.path.join('bat_files','stop_server.bat')], str(idx))
         res = {
                 'racePos' : 100,
                 'damage' : 5000,
