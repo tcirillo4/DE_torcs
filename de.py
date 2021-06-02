@@ -17,6 +17,7 @@ resume = True
 NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 parallel = True
+debug = False
 THREADS_NUM = 7
 fitness_function = fitness_1
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
@@ -60,7 +61,8 @@ problem = RaceProblem(  main_directory=MAIN_DIRECTORY,
                         parallel=parallel, 
                         num_threads=THREADS_NUM, 
                         fitness_function= fitness_function,
-                        tracks = TRACKS_TO_USE
+                        tracks = TRACKS_TO_USE,
+                        debug = debug
                         )
 
 termination = get_termination("n_gen", max_gens)

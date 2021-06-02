@@ -81,7 +81,7 @@ def wait_results(nodes, main_directory):
 
 class RaceProblem(Problem):
 
-    def __init__(self, main_directory, fitness_function, tracks, resume = True, num_nodes = 4, parallel = True, num_threads = 5):
+    def __init__(self, main_directory, fitness_function, tracks, resume = True, num_nodes = 4, parallel = True, num_threads = 5, debug = False):
         super().__init__(n_var=48, n_obj=1, xl =  np.full(48, -10000), xu=  np.full(48, 10000))
         pfile= open('real_parameters','r')
         self.parameters= json.load(pfile)
@@ -91,6 +91,7 @@ class RaceProblem(Problem):
         self.parallel = parallel
         self.fitness = fitness_function
         self.tracks = tracks
+        self.debug = debug
         if self.parallel:
             self.num_threads = num_threads
         if not resume:
@@ -107,7 +108,13 @@ class RaceProblem(Problem):
             send_parameters(os.path.join(self.main_directory, str(i) + OUTPUT_FILE), x[samples[i][0] : samples[i][1]])
         
         if self.parallel:
-            res = evaluate_batch_parallel(x[samples[0][0] : samples[0][1]], list(self.parameters.keys()), self.num_threads, available_tracks=self.tracks, fitness_function= self.fitness)
+            res = evaluate_batch_parallel(x[samples[0][0] : samples[0][1]], 
+                                            list(self.parameters.keys()), 
+                                            self.num_threads, 
+                                            available_tracks=self.tracks, 
+                                            fitness_function= self.fitness,
+                                            debug = self.debug
+                                            )
         else:
             res = evaluate_batch(x[samples[0][0] : samples[0][1]], list(self.parameters.keys()))
 

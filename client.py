@@ -706,7 +706,7 @@ def initialize_car(c):
 def launch_server(i = 1):
     subprocess.call([os.path.join('bat_files','server.bat'), str(i)])
 
-def run_all(parameters, idx , track = 'forza'):
+def run_all(parameters, idx , track = 'forza', debug = False):
     global C, T, p 
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
     TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
@@ -747,7 +747,8 @@ def run_all(parameters, idx , track = 'forza'):
         C.respond_to_server()
         C.shutdown()
     except Exception as ex:
-        print("Error: " + str(ex))
+        if debug:
+            print("Error: " + str(ex))
         subprocess.call([os.path.join('bat_files','stop_server.bat'), str(idx)])
         return {
             'trackPos' : [10000],
