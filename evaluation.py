@@ -8,6 +8,7 @@ import time
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import math
+import numpy as np
 import random
 
 DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')

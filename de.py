@@ -18,10 +18,10 @@ NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 parallel = True
 debug = False
-THREADS_NUM = 12
+THREADS_NUM = 6
 fitness_function = fitness_1
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
-TRACKS_TO_USE = ['eTrack_3', 'wheel']
+TRACKS_TO_USE = ['eTrack_3']
 
 def read_parameters():
     parameters = []

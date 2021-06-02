@@ -14,8 +14,8 @@ def fitness_speed(res):
     x3 = res['laplength'] if res['laplength'] !=0 else 10
     return (x2 / x3) + x1
 
-def fitness_1(res):
+def fitness_1(res, norm_factor = 10):
     x1 = fitness_speed(res)
-    x2 = np.sum(np.abs(res['trackPos']))
-    return x1 + x2
+    x2 = np.mean(np.abs(res['trackPos'])) 
+    return x1 + (x2 / norm_factor)
 
