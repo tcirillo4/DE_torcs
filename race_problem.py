@@ -19,14 +19,13 @@ from func_timeout import exit_after
 
 computation_weights =  {
     1 : {0 : 1},
-    2 : {0 : .65, 1 : .35},
+    2 : {0 : .68, 1 : .32},
     3 : {0 : .5, 1 : .25, 2 : .25},
     4 : {0 : .32, 1 : .17, 2 : .24, 3 : .27}
 }
 
 INPUT_FILE = '_output.csv'
 OUTPUT_FILE = '_input.csv'
-AVAIBLES_TRACK = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')
 
 
 def send_parameters(filename, parameters):
@@ -79,9 +78,10 @@ def wait_results(nodes, main_directory):
                 time.sleep(1)
     return res_lst
 
+
 class RaceProblem(Problem):
 
-    def __init__(self, main_directory, resume = True, num_nodes = 4, parallel = True, num_threads = 5):
+    def __init__(self, main_directory, fitness_function, tracks, resume = True, num_nodes = 4, parallel = True, num_threads = 5):
         super().__init__(n_var=48, n_obj=1, xl =  np.full(48, -10000), xu=  np.full(48, 10000))
         pfile= open('real_parameters','r')
         self.parameters= json.load(pfile)
@@ -89,6 +89,8 @@ class RaceProblem(Problem):
         self.main_directory = main_directory
         self.num_nodes = num_nodes
         self.parallel = parallel
+        self.fitness = fitness_function
+        self.tracks = tracks
         if self.parallel:
             self.num_threads = num_threads
         if not resume:
@@ -105,7 +107,7 @@ class RaceProblem(Problem):
             send_parameters(os.path.join(self.main_directory, str(i) + OUTPUT_FILE), x[samples[i][0] : samples[i][1]])
         
         if self.parallel:
-            res = evaluate_batch_parallel(x[samples[0][0] : samples[0][1]], list(self.parameters.keys()), self.num_threads)
+            res = evaluate_batch_parallel(x[samples[0][0] : samples[0][1]], list(self.parameters.keys()), self.num_threads, available_tracks=self.tracks, fitness_function= self.fitness)
         else:
             res = evaluate_batch(x[samples[0][0] : samples[0][1]], list(self.parameters.keys()))
 
@@ -124,6 +126,11 @@ class RaceProblem(Problem):
             self.parameters[key] = best_p[i]
 
         write_best_parameters(self.parameters)
+
+        DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
+        for track in DEFAULT_TRACKS:
+            print('TRACK: ' + track)
+            print(evaluate(best_p, 1, track))
 
         out['F'] = np.array(res_lst)
 

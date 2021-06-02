@@ -1,4 +1,6 @@
 TORCS/
 results_*/
-output_files_backup/
+backup/
 bot*/
+.*/
+__*/

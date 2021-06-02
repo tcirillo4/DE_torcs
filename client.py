@@ -707,16 +707,14 @@ def launch_server(i = 1):
     subprocess.call([os.path.join('bat_files','server.bat'), str(i)])
 
 def run_all(parameters, idx , track = 'forza'):
-    global C, T
+    global C, T, p 
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
-    last_track = track
     TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
     os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
     shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
     Thread(target= launch_server, args=[idx]).start()
     T= Track()
     C= snakeoil.Client(parameters=parameters, port=3001 + (idx - 1))
-    start = time.time()
     initialize_car(C)
     C.S.d['stucktimer']= 0
     C.S.d['targetSpeed']= 0
@@ -728,15 +726,18 @@ def run_all(parameters, idx , track = 'forza'):
             sys.exit()
         print("Track loaded!")
     try:
+        track_pos = []
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
             C.respond_to_server()
+            track_pos.append(C.S.d['trackPos'])
             if not C.is_connected():
                 break
         if not C.stage:  
             T.write_track(C.trackname) 
         results = {
+            'trackPos' : track_pos,
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
             'lapTime' : C.S.d['curLapTime'],
@@ -746,8 +747,10 @@ def run_all(parameters, idx , track = 'forza'):
         C.respond_to_server()
         C.shutdown()
     except Exception as ex:
-        print("Error: " + str(type(ex)))
+        print("Error: " + str(ex))
+        subprocess.call([os.path.join('bat_files','stop_server.bat'), str(idx)])
         return {
+            'trackPos' : [10000],
             'racePos' : 100,
             'damage' : 10000,
             'lapTime' : 1000,
@@ -800,8 +803,12 @@ def read_parameters(keys):
     return parameters
 
 if __name__ == "__main__":
-    pfile= open(os.path.join('output_files_backup','best_parameters.json'),'r')
+    DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
+    pfile= open(os.path.join('output_files','best_parameters.json'),'r')
     parameters= json.load(pfile)
+    for track in DEFAULT_TRACKS:
+        print('TRACK: ' + track)
+        print(run_all(parameters, 1, track))
     run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))

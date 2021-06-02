@@ -8,15 +8,19 @@ import random
 import json
 import os
 import csv
+from fitness_functions import *
 
 n_pop = 300
 n_vars = 48
-max_gens = 30
+max_gens = 300
 resume = True
-NUM_OF_NODES = 2
+NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 THREADS_NUM = 7
 parallel = True
+fitness_function = fitness_1
+AVAILABLE_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
+TRACKS_TO_USE = ('eTrack_3')
 
 def read_parameters():
     parameters = []
@@ -50,7 +54,14 @@ def init_population(resume = True):
     return init_pop
 
 # problem to be solved
-problem = RaceProblem(main_directory=MAIN_DIRECTORY, resume = resume, num_nodes=NUM_OF_NODES, parallel=parallel, num_threads=THREADS_NUM)
+problem = RaceProblem(  main_directory=MAIN_DIRECTORY, 
+                        resume = resume, 
+                        num_nodes=NUM_OF_NODES, 
+                        parallel=parallel, 
+                        num_threads=THREADS_NUM, 
+                        fitness_function= fitness_function,
+                        tracks = TRACKS_TO_USE
+                        )
 
 termination = get_termination("n_gen", max_gens)
 

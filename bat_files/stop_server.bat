@@ -1,2 +1,2 @@
 @echo OFF
-taskkill /F /IM "wtorcs.exe"
+taskkill  /FI "WindowTitle eq wtorcs_%1%" /T /F  
