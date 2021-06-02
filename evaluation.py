@@ -69,7 +69,6 @@ def get_samples(x, num_threads):
 
 def evaluate_batch_parameters(parameters, idx, debug = False):
     res_lst = []
-    print(idx)
     for p in tqdm(parameters):
         res = evaluate_parameters(p[0], idx, p[1], debug)
         res_lst.append(res)
