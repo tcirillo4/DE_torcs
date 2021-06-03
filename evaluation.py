@@ -31,7 +31,8 @@ def evaluate_parameters(parameters, idx, track, debug = False):
                 'distRaced' : 10,
                 'error' : True,
                 'laplength' : 10,
-                'trackPos' : [10000]
+                'trackPos' : [10000],
+                'speedX' : [1]
 
             }
     return res
