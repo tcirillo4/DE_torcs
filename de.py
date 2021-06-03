@@ -13,13 +13,13 @@ from fitness_functions import *
 n_pop = 300
 n_vars = 48
 max_gens = 300
-resume = True
+resume = False
 NUM_OF_NODES = 2
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 parallel = True
 debug = False
 THREADS_NUM = 6
-fitness_function = fitness_2
+fitness_function = fitness_time
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
 TRACKS_TO_USE = ['forza','eTrack_3','cgTrack_2','wheel']
 evaluate_all_tracks = True

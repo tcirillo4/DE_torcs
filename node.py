@@ -16,11 +16,12 @@ INPUT_FILE = str(ASSIGNED_IDX) + '_input.csv'
 OUTPUT_FILE = str(ASSIGNED_IDX) + '_output.csv'
 PFILE= open('real_parameters','r')
 AVAIBLES_TRACK = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')
-TRACK_TO_USE = ['eTrack_3']
+TRACK_TO_USE = ['forza', 'eTrack_3', 'cgTrack_2', 'wheel']
 debug = False
 parallel = True
 THREADS_NUM = 4
-fitness_function = fitness_1
+fitness_function = fitness_time
+evaluate_all_tracks = True
 
 keys= json.load(PFILE).keys()
 
@@ -54,7 +55,9 @@ def wait_parameters():
                                                     num_threads=THREADS_NUM, 
                                                     available_tracks=TRACK_TO_USE, 
                                                     debug=debug,
-                                                    fitness_function=fitness_function)
+                                                    fitness_function=fitness_function,
+                                                    all_tracks=evaluate_all_tracks
+                                                    )
             else:
                 results = evaluate_batch(parameters, keys)
             return results
