@@ -79,7 +79,8 @@ def evaluate_batch_parameters(parameters, idx, debug = False):
             else:
                 tmp = evaluate_parameters(p[0], idx, track, debug)
                 for key in res:
-                    res[key] += tmp[key]
+                    if key in tmp:
+                        res[key] += tmp[key]
         res_lst.append(res)
     return res_lst
 

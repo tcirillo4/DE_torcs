@@ -21,7 +21,7 @@ debug = False
 THREADS_NUM = 6
 fitness_function = fitness_time
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
-TRACKS_TO_USE = ['forza','eTrack_3','cgTrack_2','wheel']
+TRACKS_TO_USE = ['forza','eTrack_3','wheel']
 evaluate_all_tracks = True
 
 def read_parameters():
