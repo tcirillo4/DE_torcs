@@ -22,6 +22,7 @@ THREADS_NUM = 6
 fitness_function = fitness_2
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
 TRACKS_TO_USE = ['forza','eTrack_3','cgTrack_2','wheel']
+evaluate_all_tracks = True
 
 def read_parameters():
     parameters = []
@@ -62,7 +63,8 @@ problem = RaceProblem(  main_directory=MAIN_DIRECTORY,
                         num_threads=THREADS_NUM, 
                         fitness_function= fitness_function,
                         tracks = TRACKS_TO_USE,
-                        debug = debug
+                        debug = debug,
+                        all_tracks=evaluate_all_tracks
                         )
 
 termination = get_termination("n_gen", max_gens)

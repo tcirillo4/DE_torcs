@@ -72,7 +72,9 @@ def get_samples(x, num_threads):
 def evaluate_batch_parameters(parameters, idx, debug = False):
     res_lst = []
     for p in tqdm(parameters):
-        res = evaluate_parameters(p[0], idx, p[1], debug)
+        res = 0
+        for track in p[1]:
+            res += evaluate_parameters(p[0], idx, track, debug)
         res_lst.append(res)
     return res_lst
 
@@ -83,14 +85,15 @@ def parallel_evaluation(parameters, debug):
 
     return [value for res in all_res for value in res]
 
-def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS, fitness_function = fit, debug = False):
+def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS, fitness_function = fit, debug = False, all_tracks = False):
     parameters = []
 
     for i in range(len(batch)):
         tmp = {}
         for j, key in enumerate(keys):
             tmp[key] = batch[i][j]
-        parameters.append((tmp, random.choice(available_tracks)))
+        tracks = [random.choice(available_tracks)] if not all_tracks else available_tracks
+        parameters.append((tmp, tracks))
 
     samples = get_samples(parameters, num_threads)
 
