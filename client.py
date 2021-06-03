@@ -10,6 +10,7 @@ import os
 import random
 import shutil
 import pathlib
+from fitness_functions import *
 
 target_speed= 0 
 lap= 0 
@@ -749,7 +750,6 @@ def run_all(parameters, idx , track = 'forza', debug = False):
         }
         C.respond_to_server()
         C.shutdown()
-        import numpy as np
     except Exception as ex:
         if debug:
             print("Error: " + str(ex))
@@ -812,10 +812,10 @@ if __name__ == "__main__":
     DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
     pfile= open(os.path.join('output_files','best_parameters.json'),'r')
     parameters= json.load(pfile)
-    # for track in DEFAULT_TRACKS:
-    #     print('TRACK: ' + track)
-    #     print(run_all(parameters, 1, track)['lapTime'])
-    run_graphic(parameters)
+    for track in DEFAULT_TRACKS:
+        print('TRACK: ' + track)
+        print(fitness_2(run_all(parameters, 1, track)))
+    #run_all(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))
     #     new_param = parameters.copy()
