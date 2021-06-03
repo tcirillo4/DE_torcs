@@ -535,7 +535,7 @@ class Controller():
             return False
         return True
 
-    def learn_track(self,st,a,t,dfs, T):
+    def learn_track(self,st,a,t,dfs):
         NOSTEER= 0.07 
         self.T.laplength= max(dfs,self.T.laplength)
         if len(self.trackHistory) >= self.TRACKHISTORYMAX:
@@ -564,8 +564,8 @@ class Controller():
     def learn_track_final(self,dfs):
         self.T.sectionList.append( TrackSection(self.secBegin,dfs, self.secMagnitude, self.secWidth, self.badness) )
 
-    def drive(self,c,tick, T):
-        S,R,P= c.S.d,c.R.d,c.P
+    def drive(self,tick):
+        S,R,P= self.C.S.d,self.C.R.d,self.C.P
         self.badness= S['damage']-self.badness 
         skid= self.skid_severity(P,S['wheelSpinVel'],S['speedX'])
         if skid>1:
@@ -586,13 +586,13 @@ class Controller():
             self.badness+= 20
         infleX,infleA,straightness= self.track_sensor_analysis(S['track'],S['angle'])
         if self.target_speed>0:
-            if c.stage: 
+            if self.C.stage: 
                 if not S['stucktimer']:
                     self.target_speed= self.speed_planning(P,S['distFromStart'],S['track'],S['trackPos'],
                                             S['speedX'],S['speedY'],R['steer'],S['angle'],
                                             infleX,infleA)
                 self.target_speed+= self.jump_speed_adjustment(S['z'])
-                if c.stage > 1: 
+                if self.C.stage > 1: 
                     self.target_speed+= self.traffic_speed_adjustment(
                             S['opponents'],S['speedX'],self.target_speed,S['track'])
                 self.target_speed*= self.damage_speed_adjustment(S['damage'])
@@ -619,7 +619,7 @@ class Controller():
                         if snext.self.badness>1000: caution= .75
                         if snext.self.badness>10000: caution= .5
         self.target_speed*= caution
-        if self.T.usable_model or c.stage>1:
+        if self.T.usable_model or self.C.stage>1:
             if abs(S['trackPos']) > 1:
                 s= self.steer_centeralign(P,R['steer'],S['trackPos'],S['angle'])
                 self.badness+= 1
@@ -632,7 +632,7 @@ class Controller():
         if S['stucktimer'] and S['distRaced']>20:
             if self.target_speed<0:
                 R['steer']= -S['angle']
-        if c.stage > 1: 
+        if self.C.stage > 1: 
             if self.target_speed < 0: 
                 self.target_speed*= snakeoil.clip(S['opponents'][0]/20,  .1, 1)
                 self.target_speed*= snakeoil.clip(S['opponents'][35]/20, .1, 1)
@@ -660,8 +660,8 @@ class Controller():
         if not self.lap: 
             self.T.laplength= max(S['distFromStart'],self.T.laplength)
         elif self.lap == 1 and not self.usable_model: 
-            self.learn_track(R['steer'],S['angle'],S['track'],S['distFromStart'], T)
-        elif c.stage == 3:
+            self.learn_track(R['steer'],S['angle'],S['track'],S['distFromStart'])
+        elif self.C.stage == 3:
             pass 
         else: 
             if not self.learn_final: 
@@ -672,7 +672,7 @@ class Controller():
                 self.properself.lap= S['distRaced']/self.T.laplength
             else:
                 self.properself.lap= 0
-            if c.stage == 0 and self.lap < 4: 
+            if self.C.stage == 0 and self.lap < 4: 
                 self.T.record_self.badness(self.badness,S['distFromStart'])
         S['targetSpeed']= self.target_speed 
         self.target_speed= 70 
@@ -699,13 +699,12 @@ def run_all(controller, parameters, idx , track = 'forza'):
     os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
     shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
     Thread(target= launch_server, args=[idx]).start()
-    start = time.time()
-    controller.initialize_car(C)
+    controller.initialize_car()
     controller.C.S.d['stucktimer']= 0
     controller.C.S.d['targetSpeed']= 0
     if controller.C.stage == 1 or controller.C.stage == 2:
         try:
-            T.load_track(controller.C.trackname)
+            controller.T.load_track(controller.C.trackname)
         except:
             print("Could not load the track: %s" % controller.C.trackname)
             sys.exit()
@@ -714,7 +713,7 @@ def run_all(controller, parameters, idx , track = 'forza'):
         track_pos = []
         for step in range(controller.C.maxSteps,0,-1):
             controller.C.get_servers_input()
-            controller.drive(C,step, T)
+            controller.drive(step)
             controller.C.respond_to_server()
             track_pos.append(controller.C.S.d['trackPos'])
             if not controller.C.is_connected():

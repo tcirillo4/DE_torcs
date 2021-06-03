@@ -727,11 +727,13 @@ def run_all(parameters, idx , track = 'forza', debug = False):
         print("Track loaded!")
     try:
         track_pos = []
+        speed= []
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
             C.respond_to_server()
             track_pos.append(C.S.d['trackPos'])
+            speed.append(C.S.d['speedX'])
             if not C.is_connected():
                 break
         if not C.stage:  
@@ -742,10 +744,12 @@ def run_all(parameters, idx , track = 'forza', debug = False):
             'damage' : C.S.d['damage'],
             'lapTime' : C.S.d['curLapTime'],
             'distRaced' : C.S.d['distRaced'],
-            'laplength' : T.laplength
+            'laplength' : T.laplength,
+            'speedX' : speed
         }
         C.respond_to_server()
         C.shutdown()
+        import numpy as np
     except Exception as ex:
         if debug:
             print("Error: " + str(ex))
@@ -757,7 +761,8 @@ def run_all(parameters, idx , track = 'forza', debug = False):
             'lapTime' : 1000,
             'distRaced' : 10,
             'error' : True,
-            'laplength' : T.laplength
+            'laplength' : T.laplength,
+            'speedX' : [1]
         }
     return results
     

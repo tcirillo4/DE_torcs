@@ -63,6 +63,12 @@ def generate_samples(x, nodes):
 
     return samples
 
+def write_results(min, avg, tracks_time):
+    with open(os.path.join('output_files','results.csv') , 'a', newline='') as f: 
+            writer = csv.writer(f, delimiter=',',
+                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow([min, avg] + tracks_time)
+
 def wait_results(nodes, main_directory):
     res_lst = []
     for i in range(1, nodes):
@@ -94,8 +100,10 @@ class RaceProblem(Problem):
         if self.parallel:
             self.num_threads = num_threads
         if not resume:
-            with open(os.path.join('output_files','results.csv') , 'w'): pass
-        
+            with open(os.path.join('output_files','results.csv') , 'w', newline='') as f: 
+                    writer = csv.writer(f, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                    writer.writerow(['min', 'avg'] + tracks)
 
     def _evaluate(self, x, out, *args, **kwargs):
         res_lst = []
@@ -123,9 +131,6 @@ class RaceProblem(Problem):
 
         res_lst.extend(res)
         
-        with open(os.path.join('output_files','results.csv'), 'a', newline='') as f: 
-            f.write(str(min(res_lst)) + '\n')
-
         best_p = x[np.argmin(res_lst)]
 
         for i, key in enumerate(list(self.parameters.keys())):
@@ -134,10 +139,14 @@ class RaceProblem(Problem):
         write_best_parameters(self.parameters)
 
         DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
+        tracks_res = []
         for track in DEFAULT_TRACKS:
             print('TRACK: ' + track)
             res = evaluate(self.parameters, 1, track)
+            tracks_res.append(res['lapTime'])
             print(res['lapTime'] if 'error' not in res else 'ERROR')
+
+        write_results(min(res_lst), np.mean(res_lst), tracks_res)
 
         out['F'] = np.array(res_lst)
 
