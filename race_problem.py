@@ -97,7 +97,9 @@ class RaceProblem(Problem):
                         all_tracks = False,
                         opponents = False
                         ):
-        super().__init__(n_var=48, n_obj=1, xl =  np.full(48, -10000), xu=  np.full(48, 10000))
+        pbound = open('parameters_bounds')
+        bounds = np.array(json.load(pbound)['bounds'])
+        super().__init__(n_var=48, n_obj=1, xl =  bounds[:,0], xu=  bounds[:,1])
         pfile= open('real_parameters','r')
         self.parameters= json.load(pfile)
         self.resume = resume

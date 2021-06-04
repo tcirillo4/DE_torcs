@@ -134,6 +134,7 @@ class TrackSection():
 class Controller():
 
     def init(self, idx, parameters):
+        print('init')
         self.target_speed= 0 
         self.lap= 0 
         self.prev_distance_from_start= 1 
@@ -692,54 +693,65 @@ class Controller():
 def launch_server(i = 1):
     subprocess.call([os.path.join('bat_files','server.bat'), str(i)])
 
-def run_all(controller, parameters, idx , track = 'forza'):
+def run_all(controller, parameters, idx , track = 'forza', debug = False, opponents = False):
     controller.init(idx, parameters)
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
     TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
     os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
-    shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races', track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
+    shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races' + ("_2" if opponents else ""), track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
     Thread(target= launch_server, args=[idx]).start()
+    print('ok')
     controller.initialize_car()
     controller.C.S.d['stucktimer']= 0
     controller.C.S.d['targetSpeed']= 0
     if controller.C.stage == 1 or controller.C.stage == 2:
         try:
-            controller.T.load_track(controller.C.trackname)
+            controller.T.load_track(C.trackname)
         except:
-            print("Could not load the track: %s" % controller.C.trackname)
+            print("Could not load the track: %s" % C.trackname)
             sys.exit()
         print("Track loaded!")
     try:
         track_pos = []
-        for step in range(controller.C.maxSteps,0,-1):
+        speed= []
+        for step in range(C.maxSteps,0,-1):
             controller.C.get_servers_input()
-            controller.drive(step)
+            controller.drive(C,step)
             controller.C.respond_to_server()
-            track_pos.append(controller.C.S.d['trackPos'])
+            track_pos.append(C.S.d['trackPos'])
+            speed.append(C.S.d['speedX'])
             if not controller.C.is_connected():
                 break
         if not controller.C.stage:  
-            T.write_track(controller.C.trackname) 
+            controller.T.write_track(C.trackname) 
         results = {
             'trackPos' : track_pos,
             'racePos' : controller.C.S.d['racePos'],
             'damage' : controller.C.S.d['damage'],
             'lapTime' : controller.C.S.d['curLapTime'],
             'distRaced' : controller.C.S.d['distRaced'],
-            'laplength' : controller.T.laplength
+            'racePos' : controller.C.S.d['racePos'],
+            'damage' : controller.C.S.d['damage'],
+            'laplength' : controller.T.laplength,
+            'speedX' : speed
         }
         controller.C.respond_to_server()
         controller.C.shutdown()
     except Exception as ex:
-        print("Error: " + str(ex))
+        if debug:
+            print("Error: " + str(ex))
+        subprocess.call([os.path.join('bat_files','stop_server.bat'), str(idx)])
         return {
-            'trackPos' : [100],
+            'trackPos' : [10000],
             'racePos' : 100,
             'damage' : 10000,
             'lapTime' : 1000,
             'distRaced' : 10,
+            'damage' : 10000,
+            'racePos' : 10,
             'error' : True,
-            'laplength' : controller.T.laplength
+            'laplength' : T.laplength,
+            'speedX' : [1]
         }
     return results
     
