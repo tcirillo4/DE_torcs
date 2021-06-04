@@ -13,8 +13,8 @@ from fitness_functions import *
 n_pop = 300
 n_vars = 48
 max_gens = 300
-resume = False
-NUM_OF_NODES = 2
+resume = True
+NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 parallel = True
 debug = False
@@ -23,6 +23,7 @@ fitness_function = fitness_time
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
 TRACKS_TO_USE = ['forza','eTrack_3','wheel']
 evaluate_all_tracks = True
+opponents = True
 
 def read_parameters():
     parameters = []
@@ -64,7 +65,8 @@ problem = RaceProblem(  main_directory=MAIN_DIRECTORY,
                         fitness_function= fitness_function,
                         tracks = TRACKS_TO_USE,
                         debug = debug,
-                        all_tracks=evaluate_all_tracks
+                        all_tracks=evaluate_all_tracks,
+                        opponents = opponents
                         )
 
 termination = get_termination("n_gen", max_gens)

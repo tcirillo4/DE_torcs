@@ -15,10 +15,10 @@ DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
 
 
 @exit_after(15)
-def evaluate_parameters(parameters, idx, track, debug = False):
+def evaluate_parameters(parameters, idx, track, debug = False, opponents = False):
     start = time.time()
     try:
-        res = evaluate(parameters, idx,track, debug)
+        res = evaluate(parameters, idx,track, debug, opponents)
     except KeyboardInterrupt:
         elapsed_time = time.time() - start
         if elapsed_time < 14:
@@ -31,6 +31,8 @@ def evaluate_parameters(parameters, idx, track, debug = False):
                 'distRaced' : 10,
                 'error' : True,
                 'laplength' : 10,
+                'damage' : 10000,
+                'racePos' : 10,
                 'trackPos' : [10000],
                 'speedX' : [1]
 
@@ -69,29 +71,29 @@ def get_samples(x, num_threads):
 
     return samples
 
-def evaluate_batch_parameters(parameters, idx, debug = False):
+def evaluate_batch_parameters(parameters, idx, debug = False, opponents=False):
     res_lst = []
     for p in tqdm(parameters):
         res = None
         for track in p[1]:
             if res is None:
-                res = evaluate_parameters(p[0], idx, track, debug)
+                res = evaluate_parameters(p[0], idx, track, debug,opponents)
             else:
-                tmp = evaluate_parameters(p[0], idx, track, debug)
+                tmp = evaluate_parameters(p[0], idx, track, debug,opponents)
                 for key in res:
                     if key in tmp:
                         res[key] += tmp[key]
         res_lst.append(res)
     return res_lst
 
-def parallel_evaluation(parameters, debug):
+def parallel_evaluation(parameters, debug, opponents):
 
     with Parallel(n_jobs=len(parameters)) as parallel:
-        all_res = parallel(delayed(evaluate_batch_parameters)(p,i + 1, debug) for i, p in enumerate(parameters))
+        all_res = parallel(delayed(evaluate_batch_parameters)(p,i + 1, debug, opponents) for i, p in enumerate(parameters))
 
     return [value for res in all_res for value in res]
 
-def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS, fitness_function = fit, debug = False, all_tracks = False):
+def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEFAULT_TRACKS, fitness_function = fit, debug = False, all_tracks = False, opponents = False):
     parameters = []
 
     for i in range(len(batch)):
@@ -103,5 +105,5 @@ def evaluate_batch_parallel(batch, keys, num_threads = 5, available_tracks = DEF
 
     samples = get_samples(parameters, num_threads)
 
-    res_lst = [fitness_function(res) for res  in parallel_evaluation(samples, debug)]
+    res_lst = [fitness_function(res) for res  in parallel_evaluation(samples, debug, opponents)]
     return res_lst
