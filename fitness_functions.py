@@ -6,7 +6,10 @@ def track_center_fitness(res):
 
 def fitness_time(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else res['laplength'] - res['distRaced']
-    return res['lapTime'] + x1
+    x2 = res['lapTime'] 
+    if x2 < 40:
+        x2 = 1000
+    return  x1 + x2
 
 def fitness_speed_lap(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']

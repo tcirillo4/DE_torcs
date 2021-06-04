@@ -156,9 +156,11 @@ class RaceProblem(Problem):
         tracks_res = []
         for track in DEFAULT_TRACKS:
             print('TRACK: ' + track)
-            res = evaluate(self.parameters, 1, track)
+            res = evaluate(self.parameters, 1, track, opponents=self.opponents)
             tracks_res.append(res['lapTime'])
-            print(res['lapTime'] if 'error' not in res else 'ERROR')
+            print('Time: ' + (str(res['lapTime']) if 'error' not in res else 'ERROR'))
+            if self.opponents:   
+                print('Position: ' + (str(res['racePos']) if 'error' not in res else 'ERROR'))
 
         write_results(min(res_lst), np.mean(res_lst), tracks_res)
 
