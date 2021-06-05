@@ -1,21 +1,15 @@
 
 from pymoo.factory import Problem
 import numpy as np
-import matplotlib.pyplot as plt
-import client 
 import json
 import time
 import csv
 import os
-from tqdm import tqdm
 import math
 import time
-from joblib import Parallel, delayed
 from evaluation import *
 
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
-from func_timeout import exit_after
-
 computation_weights =  {
     1 : {0 : 1},
     2 : {0 : .7, 1 : .3},

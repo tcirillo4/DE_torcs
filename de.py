@@ -14,12 +14,12 @@ n_pop = 300
 n_vars = 48
 max_gens = 300
 resume = True
-NUM_OF_NODES = 2
+NUM_OF_NODES = 1
 MAIN_DIRECTORY = 'D:\\Cartella condivisa\\addestramento'
 parallel = True
 debug = False
 THREADS_NUM = 6
-fitness_function = fitness_time
+fitness_function = fitness_opponents
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
 TRACKS_TO_USE = ['eTrack_3']
 evaluate_all_tracks = True
@@ -74,6 +74,6 @@ termination = get_termination("n_gen", max_gens)
 #Init population from the default parameters
 
 
-algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/rand/1/bin", CR=.7, F=.9, dither="vector", jitter=True,eliminate_duplicates=False)
+algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/rand/1/bin", CR=.6, F=.8, dither="vector", jitter=True,eliminate_duplicates=False)
 
 res = minimize(problem, algorithm, termination, seed=112, verbose=True, save_history=True)

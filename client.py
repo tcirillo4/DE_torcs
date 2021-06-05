@@ -729,12 +729,14 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
     try:
         track_pos = []
         speed= []
+        opponents = []
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
             C.respond_to_server()
             track_pos.append(C.S.d['trackPos'])
             speed.append(C.S.d['speedX'])
+            opponents += C.S.d['opponents'][9:27]
             if not C.is_connected():
                 break
         if not C.stage:  
@@ -748,7 +750,8 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
             'laplength' : T.laplength,
-            'speedX' : speed
+            'speedX' : speed,
+            'opponents' : opponents
         }
         C.respond_to_server()
         C.shutdown()

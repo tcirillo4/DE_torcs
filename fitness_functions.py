@@ -31,7 +31,9 @@ def fitness_2(res, norm_factor = 10):
 
 def fitness_opponents(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']
-    x2 =  res['lapTime']
-    x3 = res['damage']
-    x4 = res['racePos']
-    return x1 + x2 + (x2 / 100) + (x4*100)
+    # x2 =  res['lapTime']
+    # if x2 < 60:
+    #     x2 = 1000
+    x2 = res['damage']
+    x3 = res['racePos']
+    return x1  + x2 + (x3 * 1000)
