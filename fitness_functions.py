@@ -33,5 +33,6 @@ def fitness_opponents(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']
     x2 = res['damage']
     x3 = res['lapTime']
-    fit = x1  + x2 + (x3 * 1000)
+    x4 = res['racePos']
+    fit = x1  + x2 + (x3 * 10) + (x4 * 1000)
     return fit
