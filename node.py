@@ -16,12 +16,12 @@ INPUT_FILE = str(ASSIGNED_IDX) + '_input.csv'
 OUTPUT_FILE = str(ASSIGNED_IDX) + '_output.csv'
 PFILE= open('real_parameters','r')
 AVAIBLES_TRACK = ('forza', 'eTrack_3', 'cgTrack_2', 'wheel')
-TRACK_TO_USE = ['forza', 'eTrack_3', 'wheel']
+TRACK_TO_USE = ['eTrack_3']
 debug = False
 opponents = True
 parallel = True
 THREADS_NUM = 4
-fitness_function = fitness_time
+fitness_function = fitness_opponents
 evaluate_all_tracks = True
 
 keys= json.load(PFILE).keys()

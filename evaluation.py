@@ -1,3 +1,4 @@
+from fitness_functions import fitness_opponents
 from client import run_all as evaluate
 from controller import Controller
 from controller import run_all
@@ -52,7 +53,6 @@ def evaluate_batch(batch, keys, available_tracks = DEFAULT_TRACKS):
             parameters = {} 
             for j, key in enumerate(keys):
                 parameters[key] = individual[j]
-
             res = evaluate_parameters(parameters, 1, available_tracks[i // change_track])
             res_lst.append(res['lapTime']/res['laplength'])
             pbar.update(1)

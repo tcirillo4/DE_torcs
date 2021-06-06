@@ -745,7 +745,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'trackPos' : track_pos,
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
-            'lapTime' : C.S.d['curLapTime'],
+            'lapTime' : max(C.S.d['curLapTime'], C.S.d['lastLapTime']),
             'distRaced' : C.S.d['distRaced'],
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
