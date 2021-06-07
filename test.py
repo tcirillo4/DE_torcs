@@ -5,8 +5,7 @@ from tqdm import tqdm
 
 def compute(track, num_iter_test, file='output_files/best_parameters.json'):
     racePos = []
-    damage = []
-    vel = []
+    lapTime = []
 
     results = []
     pfile= open(file,'r')
@@ -15,17 +14,15 @@ def compute(track, num_iter_test, file='output_files/best_parameters.json'):
         results.append(evaluate(parameters, 1, track))
     
     for res in results:
-        damage.append(res['damage'])
         racePos.append(res['racePos'])
-        vel.append(res['distRaced']/res['lapTime'])
+        lapTime.append(res['lapTime'])
     
-    return statistics.mean(damage), statistics.stdev(damage), statistics.mean(racePos), statistics.stdev(racePos), statistics.mean(vel), statistics.stdev(vel)
+    return statistics.mean(racePos), statistics.stdev(racePos), statistics.mean(lapTime), statistics.stdev(lapTime)
 
-
+#16 20
 DEFAULT_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
 for track in DEFAULT_TRACKS:
-    results = compute(track, 10, file='output_files/BEST_12GEN_CR0.7_F0.9_85-15/best_parameters.json')
+    results = compute(track, 100, file='output_files_best_parameters_opponents/best_parameters_16.0.json')
     print("Risultati su trakc: "+track)
-    print("Damage: mean", results[0], "stdev", results[1])
-    print("RacePos: mean", results[2], "stdev", results[3])
-    print("Velocity: mean", results[4], "stdev", results[5])
+    print("RacePos: mean", results[0], "stdev", results[1])
+    print("lapTime: mean", results[2], "stdev", results[3])
