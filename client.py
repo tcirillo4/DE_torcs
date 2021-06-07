@@ -817,13 +817,16 @@ def read_parameters(keys):
 
 if __name__ == "__main__":
     DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
-    pfile= open(os.path.join('backup','output_files_best','best_parameters.json'),'r')
+    pfile= open(os.path.join('output_files','best_parameters_9.0.json'),'r')
     #pfile= open('default_parameters','r')
     parameters= json.load(pfile)
-    for track in DEFAULT_TRACKS:
-        print('TRACK: ' + track)
-        print(run_all(parameters, 1, track, opponents=True)['racePos'])
-    #run_graphic(parameters)
+    # for _ in range(10):
+    #     print(run_all(parameters, 1, 'eTrack_3', opponents=True)['lapTime'])
+
+    # for track in DEFAULT_TRACKS:
+    #     print('TRACK: ' + track)
+    #     print(run_all(parameters, 1, track, opponents=True)['racePos'])
+    run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))
     #     new_param = parameters.copy()

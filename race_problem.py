@@ -41,8 +41,8 @@ def write_parameters(x):
         writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerows(x)
 
-def write_best_parameters(parameters):
-    with open(os.path.join('output_files','best_parameters.json'), 'w') as file:
+def write_best_parameters(parameters, filename):
+    with open(filename, 'w') as file:
         json.dump(parameters, file)
 
 def generate_samples(x, nodes):
@@ -146,10 +146,10 @@ class RaceProblem(Problem):
         for i, key in enumerate(list(self.parameters.keys())):
             self.parameters[key] = best_p[i]
 
-        write_best_parameters(self.parameters)
 
         DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
         tracks_res = []
+        tracks_pos = []
         for track in DEFAULT_TRACKS:
             print('TRACK: ' + track)
             res = evaluate(self.parameters, 1, track, opponents=self.opponents)
@@ -157,6 +157,9 @@ class RaceProblem(Problem):
             print('Time: ' + (str(res['lapTime']) if 'error' not in res else 'ERROR'))
             if self.opponents:   
                 print('Position: ' + (str(res['racePos']) if 'error' not in res else 'ERROR'))
+                tracks_pos.append(res['racePos'])
+
+        write_best_parameters(self.parameters, os.path.join('output_files','best_parameters_' + str(sum(tracks_pos)) + '.json'))
 
         write_results(min(res_lst), np.mean(res_lst), tracks_res)
 
