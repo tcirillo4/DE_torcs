@@ -26,12 +26,13 @@ def fitness_2(res, norm_factor = 10):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']
     x1 = x1 if res['laplength'] > 0 else 1000
     x2 = np.mean(res['speedX'])
-    x4 = np.mean([value if value > 1 else 0 for value in np.abs(res['trackPos']) ]) * 100 
+    x4 = np.mean([value if value > 1 else 0 for value in np.abs(res['trackPos'])]) * 100 
     return x1 -x2 * 0.55 +  x4 * 0.45 
 
 def fitness_opponents(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']
     x2 = res['damage']
     x3 = res['lapTime']
-    fit = x1 + 0.2 * x2 + 0.8 * x3
+    x4 = np.mean([value if value > 1 else 0 for value in np.abs(res['trackPos'])])
+    fit = x1 + 0.2 * x2 + 0.7 * x3 + 0.1*x4
     return fit

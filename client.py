@@ -31,6 +31,24 @@ last_track = None
 C =None
 T = None
 
+def reset_global_variables():
+    global target_speed, lap, prev_distance_from_start, learn_final, opHistory, trackHistory, TRACKHISTORYMAX, secType, secBegin
+    global secMagnitude, secWidth, sangs, sangsrad, badness
+    target_speed= 0 
+    lap= 0 
+    prev_distance_from_start= 1 
+    learn_final= False 
+    opHistory= list() 
+    trackHistory= [0] 
+    TRACKHISTORYMAX= 50 
+    secType= 0 
+    secBegin= 0 
+    secMagnitude= 0 
+    secWidth= 0 
+    sangs= [-45,-19,-12,-7,-4,-2.5,-1.7,-1,-.5,0,.5,1,1.7,2.5,4,7,12,19,45]
+    sangsrad= [(math.pi*X/180.0) for X in sangs]
+    badness= 0
+
 class Track():
 
     def __init__(self):
@@ -709,6 +727,7 @@ def launch_server(i = 1):
 
 def run_all(parameters, idx , track = 'forza', debug = False, opponents = False):
     global C, T, p 
+    reset_global_variables()
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
     TORCS_PATH = os.path.join('TORCS', 'torcs_' + str(idx))
     os.remove(os.path.join(TORCS_PATH, 'config', 'raceman', 'quickrace.xml'))
@@ -823,9 +842,8 @@ if __name__ == "__main__":
     # for _ in range(10):
     #     print(run_all(parameters, 1, 'eTrack_3', opponents=True)['lapTime'])
 
-    # for track in DEFAULT_TRACKS:
-    #     print('TRACK: ' + track)
-    #     print(run_all(parameters, 1, track, opponents=True)['racePos'])
+    # for _ in range(100):
+    #     print(run_all(parameters, 1, 'forza', opponents=True)['racePos'])
     run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))

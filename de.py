@@ -74,6 +74,6 @@ termination = get_termination("n_gen", max_gens)
 #Init population from the default parameters
 
 
-algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/rand/1/bin", CR=.5, F=.3, dither="vector", jitter=True,eliminate_duplicates=False)
+algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/rand/1/bin", CR=.6, F=.7, dither="vector", jitter=True,eliminate_duplicates=False)
 
 res = minimize(problem, algorithm, termination, seed=112, verbose=True, save_history=True)

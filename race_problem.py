@@ -12,7 +12,7 @@ from evaluation import *
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 computation_weights =  {
     1 : {0 : 1},
-    2 : {0 : .7, 1 : .3},
+    2 : {0 : .6, 1 : .4},
     3 : {0 : .5, 1 : .25, 2 : .25},
     4 : {0 : .48, 1 : .22, 2 : .21, 3 : .9}
 }
@@ -155,6 +155,7 @@ class RaceProblem(Problem):
             res = evaluate(self.parameters, 1, track, opponents=self.opponents)
             tracks_res.append(res['lapTime'])
             print('Time: ' + (str(res['lapTime']) if 'error' not in res else 'ERROR'))
+            print('Damage: ' + (str(res['damage'])))
             if self.opponents:   
                 print('Position: ' + (str(res['racePos']) if 'error' not in res else 'ERROR'))
                 tracks_pos.append(res['racePos'])
