@@ -748,14 +748,12 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
     try:
         track_pos = []
         speed= []
-        opponents = []
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
             C.respond_to_server()
             track_pos.append(C.S.d['trackPos'])
             speed.append(C.S.d['speedX'])
-            opponents += C.S.d['opponents'][9:27]
             if not C.is_connected():
                 break
         if not C.stage:  
@@ -764,7 +762,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'trackPos' : track_pos,
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
-            'lapTime' : max(C.S.d['curLapTime'], C.S.d['lastLapTime']),
+            'lapTime' : C.S.d['lastLapTime'],
             'distRaced' : C.S.d['distRaced'],
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
@@ -836,15 +834,18 @@ def read_parameters(keys):
 
 if __name__ == "__main__":
     DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
-    pfile= open(os.path.join('output_files','best_parameters_10.0.json'),'r')
+    pfile= open(os.path.join('output_files','best_parameters_11.0.json'),'r')
     #pfile= open('default_parameters','r')
     parameters= json.load(pfile)
     # for _ in range(10):
     #     print(run_all(parameters, 1, 'eTrack_3', opponents=True)['lapTime'])
 
     for _ in range(100):
-        res = run_all(parameters, 1, 'forza', opponents=True)
-        print(res['lapTime'])
+        res_1 = run_all(parameters, 1, 'forza', opponents=True)
+        print(res_1['lapTime'])
+        # res_2 = run_all(parameters, 1, 'forza', opponents=True)
+        # print(max(res_1['times']))
+        # print(max(res_2['times']))
     #run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))
