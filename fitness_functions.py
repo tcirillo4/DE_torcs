@@ -34,5 +34,5 @@ def fitness_opponents(res):
     x2 = res['damage']
     x3 = res['lapTime']
     x4 = np.mean([value if value > 1 else 0 for value in np.abs(res['trackPos'])])
-    fit = x1 + (0.2 * x2) + (0.7 * x3) + (0.1*x4)
+    fit = x1 + (0.15 * x2) + (0.8 * x3) + (0.05*x4)
     return fit

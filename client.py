@@ -748,6 +748,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
     try:
         track_pos = []
         speed= []
+        steps = 0
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
@@ -755,6 +756,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             track_pos.append(C.S.d['trackPos'])
             speed.append(C.S.d['speedX'])
             if not C.is_connected():
+                steps = step
                 break
         if not C.stage:  
             T.write_track(C.trackname) 
@@ -762,13 +764,14 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'trackPos' : track_pos,
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
-            'lapTime' : C.S.d['lastLapTime'],
+            'lapTime' : C.S.d['lastLapTime'] + C.S.d['curLapTime'],
             'distRaced' : C.S.d['distRaced'],
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
             'laplength' : T.laplength,
             'speedX' : speed,
-            'opponents' : opponents
+            'opponents' : opponents,
+            'steps' : steps,
         }
         C.respond_to_server()
         C.shutdown()
@@ -834,19 +837,21 @@ def read_parameters(keys):
 
 if __name__ == "__main__":
     DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
-    pfile= open(os.path.join('output_files','best_parameters_11.0.json'),'r')
+    pfile= open(os.path.join('output_files','best_parameters_22.0.json'),'r')
     #pfile= open('default_parameters','r')
     parameters= json.load(pfile)
     # for _ in range(10):
     #     print(run_all(parameters, 1, 'eTrack_3', opponents=True)['lapTime'])
 
     for _ in range(100):
-        res_1 = run_all(parameters, 1, 'forza', opponents=True)
+        res_1 = run_all(parameters, 1, 'eTrack_3', opponents=True)
         print(res_1['lapTime'])
+        print(res_1['damage'])
+        print(fitness_opponents(res_1))
         # res_2 = run_all(parameters, 1, 'forza', opponents=True)
         # print(max(res_1['times']))
         # print(max(res_2['times']))
-    #run_graphic(parameters)
+    # run_graphic(parameters)
     # for _ in range(100):
     #     key= random.choice(list(parameters.keys()))
     #     new_param = parameters.copy()
