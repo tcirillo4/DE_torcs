@@ -21,7 +21,7 @@ debug = False
 THREADS_NUM = 6
 fitness_function = fitness_opponents
 AVAILABLE_TRACKS = ['forza','eTrack_3','cgTrack_2','wheel']
-TRACKS_TO_USE = ['eTrack_3']
+TRACKS_TO_USE = ['eTrack_3', 'forza']
 evaluate_all_tracks = True
 opponents = True
 
@@ -38,7 +38,7 @@ def read_parameters():
 
 def init_population(resume = True):
     if not resume:
-        pfile= open('real_parameters','r')
+        pfile= open('best_parameters_24.0.json','r')
         parameters= json.load(pfile)
         init_pop = []
         for _ in range(n_pop):
@@ -57,7 +57,8 @@ def init_population(resume = True):
     return init_pop
 
 # problem to be solved
-problem = RaceProblem(  main_directory=MAIN_DIRECTORY, 
+problem = RaceProblem(  
+                        main_directory=MAIN_DIRECTORY, 
                         resume = resume, 
                         num_nodes=NUM_OF_NODES, 
                         parallel=parallel, 
@@ -74,6 +75,6 @@ termination = get_termination("n_gen", max_gens)
 #Init population from the default parameters
 
 
-algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/rand/1/bin", CR=.7, F=.8, dither="vector", jitter=True,eliminate_duplicates=False)
+algorithm = DE(pop_size=n_pop,  sampling=init_population(resume),variant="DE/best/1/bin", CR=.7, F=.8, dither="vector", jitter=True,eliminate_duplicates=False)
 
 res = minimize(problem, algorithm, termination, seed=112, verbose=True, save_history=True)

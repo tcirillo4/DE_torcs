@@ -31,8 +31,8 @@ def fitness_2(res, norm_factor = 10):
 
 def fitness_opponents(res):
     x1 = 0 if res['distRaced']>=res['laplength'] else  res['laplength'] - res['distRaced']
-    x2 = res['damage']
+    x2 = res['damage'] / 20
     x3 = res['lapTime']
-    x4 = np.mean([value if value > 1 else 0 for value in np.abs(res['trackPos'])])
-    fit = x1 + (0.15 * x2) + (0.8 * x3) + (0.05*x4)
+    x4 = np.sum([value  for value in np.abs(res['trackPos']) if value > 0.7]) / 10
+    fit = x1 + x2 +  x3 + x4
     return fit

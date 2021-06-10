@@ -125,7 +125,7 @@ class Client():
         self.stage= 3 # 0=Warm-up, 1=Qualifying 2=Race, 3=unknown <Default=3> 
         self.debug= False
         self.maxSteps= 100000  # 50steps/second
-        self.pfilename= 'default_parameters'
+        self.pfilename= 'best_parameters_24.0.json'
         self.parse_the_command_line()
         if H: self.host= H
         if p: self.port= p
@@ -576,4 +576,6 @@ if __name__ == "__main__":
         C.get_servers_input()
         drive_example(C)
         C.respond_to_server()
+    print(C.S.d['damage'])
+    print(C.S.d['curLapTime'])
     C.shutdown()

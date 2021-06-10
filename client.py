@@ -2,15 +2,11 @@
 import sys
 import math
 import snakeoil
-from threading import Thread
-import subprocess
-import time
-import json
 import os
-import random
 import shutil
-import pathlib
-from fitness_functions import *
+import subprocess
+from threading import Thread
+import json
 
 target_speed= 0 
 lap= 0 
@@ -27,42 +23,17 @@ sangs= [-45,-19,-12,-7,-4,-2.5,-1.7,-1,-.5,0,.5,1,1.7,2.5,4,7,12,19,45]
 sangsrad= [(math.pi*X/180.0) for X in sangs]
 badness= 0
 
-last_track = None
-C =None
-T = None
-
-def reset_global_variables():
-    global target_speed, lap, prev_distance_from_start, learn_final, opHistory, trackHistory, TRACKHISTORYMAX, secType, secBegin
-    global secMagnitude, secWidth, sangs, sangsrad, badness
-    target_speed= 0 
-    lap= 0 
-    prev_distance_from_start= 1 
-    learn_final= False 
-    opHistory= list() 
-    trackHistory= [0] 
-    TRACKHISTORYMAX= 50 
-    secType= 0 
-    secBegin= 0 
-    secMagnitude= 0 
-    secWidth= 0 
-    sangs= [-45,-19,-12,-7,-4,-2.5,-1.7,-1,-.5,0,.5,1,1.7,2.5,4,7,12,19,45]
-    sangsrad= [(math.pi*X/180.0) for X in sangs]
-    badness= 0
-
 class Track():
-
     def __init__(self):
         self.laplength= 0 
         self.width= 0 
         self.sectionList= list() 
         self.usable_model= False 
-
     def __repr__(self):
         o= 'TrackList:\n'
         o+= '\n'.join([repr(x) for x in self.sectionList])
         o+= "\nLap Length: %s\n" % self.laplength
         return o
-
     def post_process_track(self):
         ws= [round(s.width) for s in self.sectionList]
         ws= filter(lambda O:O,ws) 
@@ -93,7 +64,6 @@ class Track():
                     prevS.apex= prevS.dist/2 + prevS.start
         self.sectionList= cleanedlist
         self.usable_model= True 
-
     def write_track(self,fn):
         firstline= "%f\n" % self.width 
         f= open(fn+'.trackinfo','w')
@@ -102,7 +72,6 @@ class Track():
             ts= '%f %f %f %d\n' % (s.start,s.end,s.magnitude,s.badness)
             f.write(ts)
         f.close()
-
     def load_track(self,fn):
         self.sectionList= list() 
         with open(fn+'.trackinfo','r') as f:
@@ -113,14 +82,12 @@ class Track():
                 self.sectionList.append(TS)
         self.laplength= self.sectionList[-1].end
         self.usable_model= True 
-        
     def section_in_now(self,d):
         for s in self.sectionList:
             if s.start < d < s.end:
                 return s
         else:
             return None
-
     def section_ahead(self,d):
         for n,s in enumerate(self.sectionList):
             if s.start < d < s.end:
@@ -130,14 +97,11 @@ class Track():
                     return self.sectionList[0]
         else:
             return None
-
     def record_badness(self,b,d):
         sn= self.section_in_now(d)
         if sn:
             sn.badness+= b
-
 class TrackSection():
-
     def __init__(self,sBegin,sEnd,sMag,sWidth,sBadness):
         if sMag:
             self.direction= int(abs(sMag)/sMag) 
@@ -152,7 +116,6 @@ class TrackSection():
         self.width= sWidth 
         self.severity= self.magnitude/self.dist 
         self.badness= sBadness
-
     def __repr__(self):
         tt= ['Right', 'Straight', 'Left'][self.direction+1]
         o=  "S: %f  " % self.start
@@ -162,13 +125,10 @@ class TrackSection():
         o+= "M: %f " % self.magnitude
         o+= "B: %f " % self.badness
         return o
-
     def update(self, distFromStart, trackPos, steer, angle, z):
         pass
-
     def current_section(self,x):
         return self.begin <= x and x <= self.end
-
 def automatic_transimission(P,r,g,c,rpm,sx,ts,tick):
     clutch_releaseF= .05 
     ng,nc= g,c 
@@ -224,7 +184,6 @@ def automatic_transimission(P,r,g,c,rpm,sx,ts,tick):
     else:
         pass
     return ng,nc
-
 def find_slip(wsv_list):
     w1,w2,w3,w4= wsv_list
     if w1:
@@ -232,7 +191,6 @@ def find_slip(wsv_list):
     else:
         slip= 0
     return slip
-
 def track_sensor_analysis(t,a):
     alpha= 0
     sense= 1 
@@ -313,7 +271,6 @@ def track_sensor_analysis(t,a):
         infleX= max(t)
         turnsangle= sangs[t.index(infleX)]
     return (infleX,turnsangle,straightness)
-
 def speed_planning(P,d,t,tp,sx,sy,st,a,infleX,infleA):
     cansee= max(t[2:17])
     if cansee > 0:
@@ -343,7 +300,6 @@ def speed_planning(P,d,t,tp,sx,sy,st,a,infleX,infleA):
     uncoolsy= abs(sy)/sx
     syadjust= 2 - 1 / P['oksyp'] * uncoolsy
     return base * syadjust 
-
 def damage_speed_adjustment(d):
     dsa= 1
     if d > 1000: dsa=.98
@@ -353,12 +309,10 @@ def damage_speed_adjustment(d):
     if d > 5000: dsa=.90
     if d > 6000: dsa=.88
     return dsa
-
 def jump_speed_adjustment(z):
     offtheground= snakeoil.clip(z-.350,0,1000)
     jsa= offtheground * -800
     return jsa
-
 def traffic_speed_adjustment(os,sx,ts,tsen):
     global opHistory
     if not opHistory: 
@@ -402,7 +356,6 @@ def traffic_speed_adjustment(os,sx,ts,tsen):
     tsa= max_tsa * seriousness
     tsa= snakeoil.clip(tsa,-ts,0) 
     return tsa
-
 def steer_centeralign(P,sti,tp,a,ttp=0):
     pointing_ahead= abs(a) < P['pointingahead'] 
     onthetrack= abs(tp) < P['sortofontrack']
@@ -416,14 +369,12 @@ def steer_centeralign(P,sti,tp,a,ttp=0):
     ttp*= 1-a  
     sto+= (ttp - min(tp,P['steer2edge'])) * P['s2cen'] * offrd 
     return sto 
-
 def speed_appropriate_steer(P,sto,sx):
     if sx > 0:
         stmax=  max(P['sxappropriatest1']/math.sqrt(sx)-P['sxappropriatest2'],P['safeatanyspeed'])
     else:
         stmax= 1
     return snakeoil.clip(sto,-stmax,stmax)
-
 def steer_reactive(P,sti,tp,a,t,sx,infleX,infleA,str8ness):
     if abs(a) > .6: 
         return steer_centeralign(P,sti,tp,a)
@@ -439,10 +390,7 @@ def steer_reactive(P,sti,tp,a,t,sx,infleX,infleA,str8ness):
             ttp= MaxSensorAng * - P['s2sen'] / maxsen
         else: 
             if str8ness < P['str8thresh'] and abs(infleA)>P['ignoreinfleA']:
-                try:
-                    ttp= -abs(infleA)/infleA
-                except ZeroDivisionError:
-                    ttp = 0
+                ttp= -abs(infleA)/infleA
                 aadj= 0 
             else:
                 ttp= 0
@@ -456,7 +404,6 @@ def steer_reactive(P,sti,tp,a,t,sx,infleX,infleA,str8ness):
             ttp= 0
     sto= steer_centeralign(P,sti,tp,aadj,ttp)
     return speed_appropriate_steer(P,sto,sx)
-
 def traffic_navigation(os, sti):
     sto= sti 
     c= min(os[4:32]) 
@@ -475,7 +422,6 @@ def traffic_navigation(os, sti):
     if .1 < os[18] < 40:
         sto-= .01
     return sto
-
 def clutch_control(P,cli,sl,sx,sy,g):
     if abs(sx) < .1 and not cli: 
         return 1  
@@ -483,7 +429,6 @@ def clutch_control(P,cli,sl,sx,sy,g):
     clo+= sl/P['clutchslip']
     clo+= sy/P['clutchspin']
     return clo
-
 def throttle_control(P,ai,ts,sx,sl,sy,ang,steer):
     ao= ai 
     if ts < 0:
@@ -506,7 +451,6 @@ def throttle_control(P,ai,ts,sx,sl,sy,ang,steer):
         ao-= wwcut
     if ao > .8: ao= 1
     return ao
-    
 def brake_control(P,bi,sx,sy,ts,sk):
     bo= bi 
     toofast= sx-ts
@@ -523,19 +467,16 @@ def brake_control(P,bi,sx,sy,ts,sk):
     if sy:
         sycon= min(1,  P['sycon2']-P['sycon1']*math.log(abs(sy))  )
     return min(bo,sycon)
-
 def iberian_skid(wsv,sx):
     speedps= sx/3.6
     sxshouldbe= sum( [ [.3179,.3179,.3276,.3276][x] * wsv[x] for x in range(3) ] ) / 4.0
     return speedps-sxshouldbe
-
 def skid_severity(P,wsv_list,sx):
     skid= 0
     avgws= sum(wsv_list)/4 
     if avgws:
         skid= P['skidsev1']*sx/avgws - P['wheeldia'] 
     return skid
-
 def car_might_be_stuck(sx,a,p):
     if p > 1.2 and a < -.5:
         return True
@@ -544,7 +485,6 @@ def car_might_be_stuck(sx,a,p):
     if sx < 3: 
         return True
     return False 
-
 def car_is_stuck(sx,t,a,p,fwdtsen,ts):
     if fwdtsen > 5 and ts > 0: 
         return False
@@ -553,7 +493,6 @@ def car_is_stuck(sx,t,a,p,fwdtsen,ts):
     if t < 100: 
         return False
     return True
-
 def learn_track(st,a,t,dfs):
     global secType
     global secBegin
@@ -583,7 +522,6 @@ def learn_track(st,a,t,dfs):
             secBegin= dfs 
     if not secWidth and abs(a) < NOSTEER:
         secWidth= t[0]+t[-1] 
-        
 def learn_track_final(dfs):
     global secType
     global secBegin
@@ -591,7 +529,6 @@ def learn_track_final(dfs):
     global secWidth
     global badness
     T.sectionList.append( TrackSection(secBegin,dfs, secMagnitude, secWidth, badness) )
-
 def drive(c,tick):
     S,R,P= c.S.d,c.R.d,c.P
     global target_speed
@@ -711,7 +648,6 @@ def drive(c,tick):
     target_speed= 70 
     badness= S['damage']
     return
-
 def initialize_car(c):
     R= c.R.d
     R['gear']= 1 
@@ -722,10 +658,54 @@ def initialize_car(c):
     R['focus']= 0 
     c.respond_to_server() 
 
+
+def run():
+    global T, C
+    T= Track()
+    C= snakeoil.Client()
+    if C.stage == 1 or C.stage == 2:
+        try:
+            T.load_track(C.trackname)
+        except:
+            print("Could not load the track: %s" % C.trackname)
+            sys.exit()
+        print("Track loaded!")
+    initialize_car(C)
+    C.S.d['stucktimer']= 0
+    C.S.d['targetSpeed']= 0
+    for step in range(C.maxSteps,0,-1):
+        C.get_servers_input()
+        drive(C,step)
+        C.respond_to_server()
+    if not C.stage:  
+        T.write_track(C.trackname) 
+    C.R.d['meta']= 1
+    C.respond_to_server()
+    C.shutdown()
+
 def launch_server(i = 1):
     subprocess.call([os.path.join('bat_files','server.bat'), str(i)])
 
-def run_all(parameters, idx , track = 'forza', debug = False, opponents = False):
+def reset_global_variables():
+    global target_speed, lap, prev_distance_from_start, learn_final, opHistory, trackHistory, TRACKHISTORYMAX, secType, secBegin
+    global secMagnitude, secWidth, sangs, sangsrad, badness
+    target_speed= 0 
+    lap= 0 
+    prev_distance_from_start= 1 
+    learn_final= False 
+    opHistory= list() 
+    trackHistory= [0] 
+    TRACKHISTORYMAX= 50 
+    secType= 0 
+    secBegin= 0 
+    secMagnitude= 0 
+    secWidth= 0 
+    sangs= [-45,-19,-12,-7,-4,-2.5,-1.7,-1,-.5,0,.5,1,1.7,2.5,4,7,12,19,45]
+    sangsrad= [(math.pi*X/180.0) for X in sangs]
+    badness= 0
+
+
+def run_all(parameters, idx=1, track = 'forza', debug = False, opponents = True):
     global C, T
     reset_global_variables()
     assert(track in ['forza', 'eTrack_3', 'cgTrack_2', 'wheel'])
@@ -734,7 +714,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
     shutil.copy(os.path.join(TORCS_PATH, 'config', 'custom_races' + ("_2" if opponents else ""), track +  '.xml'),os.path.join(TORCS_PATH, 'config', 'raceman','quickrace.xml'))
     Thread(target= launch_server, args=[idx]).start()
     T= Track()
-    C= snakeoil.Client(parameters=parameters, port=3001 + (idx - 1))
+    C= snakeoil.Client(parameters = parameters, port=3001 + (idx - 1))
     initialize_car(C)
     C.S.d['stucktimer']= 0
     C.S.d['targetSpeed']= 0
@@ -749,12 +729,15 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
         track_pos = []
         speed= []
         steps = 0
+        maxTime = 0
         for step in range(C.maxSteps,0,-1):
             C.get_servers_input()
             drive(C,step)
             C.respond_to_server()
             track_pos.append(C.S.d['trackPos'])
             speed.append(C.S.d['speedX'])
+            if C.S.d['curLapTime'] > maxTime:
+                maxTime = C.S.d['curLapTime']
             if not C.is_connected():
                 steps = step
                 break
@@ -764,7 +747,7 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'trackPos' : track_pos,
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
-            'lapTime' : C.S.d['lastLapTime'] + C.S.d['curLapTime'],
+            'lapTime' : maxTime,
             'distRaced' : C.S.d['distRaced'],
             'racePos' : C.S.d['racePos'],
             'damage' : C.S.d['damage'],
@@ -792,72 +775,11 @@ def run_all(parameters, idx , track = 'forza', debug = False, opponents = False)
             'speedX' : [1]
         }
     return results
-    
-def run_graphic(parameters):
-    global C, T
-    T= Track()
-    C= snakeoil.Client(parameters=parameters)
-    initialize_car(C)
-    C.S.d['stucktimer']= 0
-    C.S.d['targetSpeed']= 0
-    if C.stage == 1 or C.stage == 2:
-        try:
-            T.load_track(C.trackname)
-        except:
-            print("Could not load the track: %s" % C.trackname)
-            sys.exit()
-        print("Track loaded!")
-    for step in range(C.maxSteps,0,-1):
-        C.get_servers_input()
-        drive(C,step)
-        C.respond_to_server()
-        if not C.is_connected():
-            break
-    if not C.stage:  
-        T.write_track(C.trackname) 
-    results = {
-        'racePos' : C.S.d['racePos'],
-        'damage' : C.S.d['damage'],
-        'lapTime' : C.S.d['curLapTime']
-    }
-    C.respond_to_server()
-    C.shutdown()
-    return results
 
-def read_parameters(keys):
-    import csv
-    parameters = []
-    with open('1_input.csv', mode='r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for i, row in enumerate(csv_reader):
-                parameters.append(dict())
-                for j,key in enumerate(keys):
-                    parameters[-1][key] = float(row[j])
-    return parameters
 
-if __name__ == "__main__":
-    DEFAULT_TRACKS = ('forza','eTrack_3','cgTrack_2','wheel')
-    pfile= open(os.path.join('output_files','best_parameters_22.0.json'),'r')
+if __name__ == '__main__':
+    pfile= open('best_parameters_24.0.json','r')
     #pfile= open('default_parameters','r')
     parameters= json.load(pfile)
-    # for _ in range(10):
-    #     print(run_all(parameters, 1, 'eTrack_3', opponents=True)['lapTime'])
-
     for _ in range(100):
-        res_1 = run_all(parameters, 1, 'eTrack_3', opponents=True)
-        print(res_1['lapTime'])
-        print(res_1['damage'])
-        print(fitness_opponents(res_1))
-        # res_2 = run_all(parameters, 1, 'forza', opponents=True)
-        # print(max(res_1['times']))
-        # print(max(res_2['times']))
-    # run_graphic(parameters)
-    # for _ in range(100):
-    #     key= random.choice(list(parameters.keys()))
-    #     new_param = parameters.copy()
-    #     new_param[key] += random.random() * parameters[key]
-    #     start = time.time()
-    #     run_all(new_param)
-    #     print('Time: ' + str(round(time.time() - start,2)))
-
-
+        run_all(parameters)

@@ -78,10 +78,6 @@ def evaluate_batch_parameters(parameters, idx, debug = False, opponents=False):
         for track in p[1]:
             if res is None:
                 res = evaluate_parameters(p[0], idx, track, debug,opponents)
-                fit = fitness_opponents(res)
-                if fit < 150:
-                    print('fit: ' + str(fit))
-                    print('steps: ' + str(res['steps']))
             else:
                 tmp = evaluate_parameters(p[0], idx, track, debug,opponents)
                 for key in res:

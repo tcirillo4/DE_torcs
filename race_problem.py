@@ -12,7 +12,7 @@ from evaluation import *
 from pymoo.operators.sampling.latin_hypercube_sampling import LatinHypercubeSampling
 computation_weights =  {
     1 : {0 : 1},
-    2 : {0 : .6, 1 : .4},
+    2 : {0 : .65, 1 : .35},
     3 : {0 : .5, 1 : .25, 2 : .25},
     4 : {0 : .48, 1 : .22, 2 : .21, 3 : .9}
 }
